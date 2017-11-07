@@ -2,6 +2,7 @@ package nan.learnjava.maven.TestMave2Eclipse;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -12,6 +13,7 @@ import org.apache.hadoop.io.IOUtils;
 import org.junit.Test;
 
 public class MvnHadoopTest {
+
 	@Test
 	/**
 	 * List all files and dirs.
@@ -29,7 +31,7 @@ public class MvnHadoopTest {
 	private void printPath(FileSystem fs, Path path) {
 		System.out.println(path.toUri().toString());
 		try {
-			if(fs.isDirectory(path)) {
+			if (fs.isDirectory(path)) {
 				FileStatus[] fsts = fs.listStatus(path);
 				for (FileStatus fst : fsts) {
 					Path p = fst.getPath();
@@ -40,7 +42,7 @@ public class MvnHadoopTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Put file specify blocksize.
 	 */
@@ -50,9 +52,11 @@ public class MvnHadoopTest {
 		conf.set("fs.defaultFS", "hdfs://192.168.137.201:8020/");
 		try {
 			FileSystem fs = FileSystem.get(conf);
-			FSDataOutputStream fsdo = fs.create(new Path("/usr/win7admin/blocksize.txt"),
-					true, 1024, (short)2, 1024);
-			FileInputStream fis = new FileInputStream("D:/HexoSourceCode/source/_posts/new1.md");
+			FSDataOutputStream fsdo = fs.create(new Path(
+					"/usr/win7admin/blocksize1.txt"), true, 1024, (short) 2,
+					1024);
+			FileInputStream fis = new FileInputStream(
+					"D:/HexoSourceCode/source/_posts/new1.md");
 			IOUtils.copyBytes(fis, fsdo, 1024);
 			fis.close();
 			fsdo.close();
@@ -60,6 +64,42 @@ public class MvnHadoopTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
+	}
+
+	/**
+	 * Get file status.
+	 */
+	@Test
+	public void testFileStatus() {
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", "hdfs://192.168.137.201:8020/");
+		FileSystem fs = null;
+		FileStatus status = null;
+		try {
+			fs = FileSystem.get(conf);
+			status = fs
+					.getFileStatus(new Path("/usr/win7admin/blocksize1.txt"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Class clazz = FileStatus.class;
+		Method[] ms = clazz.getMethods();
+
+		// reflection
+		for (Method m : ms) {
+			try {
+				String mname = m.getName();
+				Class[] paramTypes = m.getParameterTypes();
+				if ((mname.startsWith("get") || mname.startsWith("is"))
+						&& (paramTypes == null || paramTypes.length == 0)) {
+					Object ret = m.invoke(status);
+					System.out.println(mname + ":" + ret);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				continue;
+			}
+		}
 	}
 }
