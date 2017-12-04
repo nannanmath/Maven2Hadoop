@@ -1,7 +1,10 @@
 package nan.learnjava.maven.TestMave2Eclipse;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 
 import org.apache.hadoop.conf.Configuration;
@@ -10,6 +13,11 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.Compressor;
+import org.apache.hadoop.io.compress.Decompressor;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.util.ReflectionUtils;
 import org.junit.Test;
 
 public class MvnHadoopTest {
@@ -101,5 +109,53 @@ public class MvnHadoopTest {
 				continue;
 			}
 		}
+	}
+	
+	/**
+	 * Test codec.
+	 * @throws Exception 
+	 */
+	public void testEncode(Class codecClass) throws Exception {
+		Class clazz = codecClass;
+		Configuration conf = new Configuration();
+		// Get instance.
+		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(clazz, conf);
+		String ext = codec.getDefaultExtension();
+		// File input.
+		FileInputStream fis = new FileInputStream("x86.pdf");
+		// File output.
+		FileOutputStream fos = new FileOutputStream("x86.pdf" + ext);
+		OutputStream os = codec.createOutputStream(fos); // Encode.
+		// copy input to output.
+		IOUtils.copyBytes(fis, os, 1024);
+		os.close();
+	}
+	
+	/**
+	 * Test Decode.
+	 * @param enc
+	 * @throws Exception
+	 */
+	public void testDecode(Class codecClass) throws Exception {
+		Class clazz = codecClass;
+		Configuration conf = new Configuration();
+		// Get instance.
+		CompressionCodec codec = (CompressionCodec)ReflectionUtils.newInstance(clazz, conf);
+		String ext = codec.getDefaultExtension();
+		Decompressor decor = codec.createDecompressor();
+		// File input.
+		FileInputStream fis = new FileInputStream("x86.pdf" + ext);
+		// File output.
+		FileOutputStream fos = new FileOutputStream("x86.pdf" + ext + ".pdf");
+		InputStream in = codec.createInputStream(fis, decor); // Decode.
+		// copy input to output.
+		IOUtils.copyBytes(in, fos, 1024);
+		in.close();
+	}
+	
+	@Test
+	public void testCodec() throws Exception {
+		//testEncode(GzipCodec.class);
+		testDecode(GzipCodec.class);
 	}
 }
