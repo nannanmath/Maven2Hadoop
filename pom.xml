@@ -26,5 +26,16 @@
   	  <artifactId>hadoop-client</artifactId>
   	  <version>2.7.4</version>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.avro</groupId>
+    	<artifactId>avro</artifactId>
+    	<version>1.8.2</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.avro</groupId>
+    	<artifactId>avro-tools</artifactId>
+    	<version>1.8.2</version>
+    </dependency>
+    
   </dependencies>
 </project>

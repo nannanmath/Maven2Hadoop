@@ -58,7 +58,7 @@ public class TestCodec {
 		Class clazz = codecClass;
 		Configuration conf = new Configuration();
 		// Get instance.
-		CompressionCodec codec = ReflectionUtils.newInstance(clazz, conf);
+		CompressionCodec codec = (CompressionCodec) ReflectionUtils.newInstance(clazz, conf);
 		String ext = codec.getDefaultExtension();
 		long startTime = System.currentTimeMillis();
 		// File input.
@@ -83,7 +83,7 @@ public class TestCodec {
 		Class clazz = codecClass;
 		Configuration conf = new Configuration();
 		// Get instance.
-		CompressionCodec codec = ReflectionUtils.newInstance(clazz, conf);
+		CompressionCodec codec = (CompressionCodec) ReflectionUtils.newInstance(clazz, conf);
 		String ext = codec.getDefaultExtension();
 		Decompressor decor = codec.createDecompressor();
 		long startTime = System.currentTimeMillis();
